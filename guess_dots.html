@@ -59,7 +59,7 @@
       <p>Count the dots and enter your guess.</p>
       <div class="fixed-area" id="dots-map-container">
       </div>
-      <input type="number" id="dots-guess" placeholder="Enter your guess">
+      <input type="text" id="dots-guess" placeholder="Enter your guess">
       <button onclick="checkGuess()">Submit Guess</button>
       <p id="dots-feedback"></p>
       <button id="next-dots-game-button" class="hidden" onclick="nextDotsGame()">Next Game</button>
@@ -72,7 +72,7 @@
     function startDotsGame() {
       const container = document.getElementById('dots-map-container');
       container.innerHTML = '';
-      numberOfDots = Math.floor(Math.random() * 20) + 1;
+      numberOfDots = Math.floor(Math.random() * 141) + 10; // 10 to 150 dots
 
       for (let i = 0; i < numberOfDots; i++) {
         const dot = document.createElement('div');
