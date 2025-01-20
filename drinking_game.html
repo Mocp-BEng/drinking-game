@@ -40,8 +40,17 @@
 <body>
   <div class="container">
     <h1>Mini Games</h1>
-    <button onclick="location.href='guess_country.html'">Play Guess the Country</button>
-    <button onclick="location.href='guess_dots.html'">Play Guess the Dots</button>
+    <button onclick="startRandomGame()">Start Game</button>
   </div>
+
+  <script>
+    function startRandomGame() {
+      const games = ['guess_country.html', 'guess_dots.html'];
+      const randomGame = games[Math.floor(Math.random() * games.length)];
+      location.href = randomGame;
+    }
+
+    window.onload = startRandomGame;
+  </script>
 </body>
 </html>
