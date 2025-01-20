@@ -43,11 +43,11 @@
   </style>
 </head>
 <body>
-  <div class="container">
+  <div id="start-container" class="container">
     <h1>Mini Games</h1>
     <button class="start-btn" onclick="startRandomGame()" aria-label="Start Game">Start Game</button>
-    <iframe id="game-frame" class="hidden"></iframe>
   </div>
+  <iframe id="game-frame" class="hidden"></iframe>
 
   <script defer>
     function startRandomGame() {
@@ -56,6 +56,7 @@
       const gameFrame = document.getElementById('game-frame');
       gameFrame.src = randomGame;
       gameFrame.classList.remove('hidden');
+      document.getElementById('start-container').classList.add('hidden');
     }
 
     function handleGameOver(event) {
