@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reaction Time Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .hidden {
+      display: none;
+    }
+    .start-btn, .retry-btn {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .start-btn:hover, .retry-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h2>Reaction Time Game</h2>
+    <p id="instructions">Wait for the screen to change color, then tap as quickly as you can!</p>
+    <button id="start-btn" class="start-btn" onclick="startGame()">Start</button>
+    <button id="retry-btn" class="retry-btn hidden" onclick="startGame()">Retry</button>
+    <p id="result" class="hidden"></p>
+  </div>
+
+  <script>
+    let startTime;
+    let timer;
+
+    function startGame() {
+      document.getElementById('instructions').textContent = 'Wait for it...';
+      document.getElementById('start-btn').classList.add('hidden');
+      document.getElementById('retry-btn').classList.add('hidden');
+      document.getElementById('result').classList.add('hidden');
+
+      const delay = Math.floor(Math.random() * 5000) + 1000; // Random delay between 1-5 seconds
+
+      timer = setTimeout(() => {
+        document.body.style.backgroundColor = 'green';
+        startTime = new Date().getTime();
+        document.body.onclick = recordReactionTime;
+      }, delay);
+    }
+
+    function recordReactionTime() {
+      const reactionTime = new Date().getTime() - startTime;
+      document.body.style.backgroundColor = '#f4f4f9';
+      document.body.onclick = null;
+      document.getElementById('instructions').textContent = 'Your reaction time is:';
+      document.getElementById('result').textContent = `${reactionTime} ms`;
+      document.getElementById('result').classList.remove('hidden');
+      document.getElementById('retry-btn').classList.remove('hidden');
+      window.parent.postMessage('gameOver', '*');
+    }
+  </script>
+</body>
+</html>
