@@ -35,33 +35,38 @@
     button:hover {
       background-color: #0056b3;
     }
+    iframe {
+      width: 100%;
+      height: 500px;
+      border: none;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Mini Games</h1>
     <button onclick="startRandomGame()">Start Game</button>
+    <iframe id="game-frame" class="hidden"></iframe>
   </div>
 
   <script>
     function startRandomGame() {
       const games = ['guess_country.html', 'guess_dots.html'];
       const randomGame = games[Math.floor(Math.random() * games.length)];
-      location.href = randomGame;
+      const gameFrame = document.getElementById('game-frame');
+      gameFrame.src = randomGame;
+      gameFrame.classList.remove('hidden');
     }
 
-    function switchGameAfterRound() {
-      const games = ['guess_country.html', 'guess_dots.html'];
-      const randomGame = games[Math.floor(Math.random() * games.length)];
-      setTimeout(() => {
-        location.href = randomGame;
-      }, 5000); // Switch game after 5 seconds
+    function handleGameOver(event) {
+      if (event.data === 'gameOver') {
+        startRandomGame();
+      }
     }
 
-    window.onload = function() {
-      startRandomGame();
-      switchGameAfterRound();
-    };
+    window.addEventListener('message', handleGameOver);
+
+    window.onload = startRandomGame;
   </script>
 </body>
 </html>
