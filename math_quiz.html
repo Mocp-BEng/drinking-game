@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .hidden {
+      display: none;
+    }
+    .start-btn, .submit-btn {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .start-btn:hover, .submit-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h2>Math Quiz</h2>
+    <p id="question"></p>
+    <input type="number" id="answer" />
+    <button id="submit-btn" class="submit-btn hidden" onclick="submitAnswer()">Submit</button>
+    <button id="start-btn" class="start-btn" onclick="startGame()">Start</button>
+    <p id="feedback" class="hidden"></p>
+  </div>
+
+  <script>
+    let correctAnswer;
+    let timer;
+
+    function startGame() {
+      generateQuestion();
+      document.getElementById('start-btn').classList.add('hidden');
+      document.getElementById('submit-btn').classList.remove('hidden');
+      document.getElementById('feedback').classList.add('hidden');
+      document.getElementById('answer').value = '';
+      
+      timer = setTimeout(() => {
+        document.getElementById('feedback').textContent = 'Time is up! You lose.';
+        document.getElementById('feedback').classList.remove('hidden');
+        document.getElementById('submit-btn').classList.add('hidden');
+        window.parent.postMessage('gameOver', '*');
+      }, 5000);
+    }
+
+    function generateQuestion() {
+      const num1 = Math.floor(Math.random() * 10) + 1;
+      const num2 = Math.floor(Math.random() * 10) + 1;
+      correctAnswer = num1 + num2;
+      document.getElementById('question').textContent = `What is ${num1} + ${num2}?`;
+    }
+
+    function submitAnswer() {
+      clearTimeout(timer);
+      const playerAnswer = parseInt(document.getElementById('answer').value);
+      if (playerAnswer === correctAnswer) {
+        document.getElementById('feedback').textContent = 'Correct! You win.';
+      } else {
+        document.getElementById('feedback').textContent = 'Wrong! You lose.';
+      }
+      document.getElementById('feedback').classList.remove('hidden');
+      document.getElementById('submit-btn').classList.add('hidden');
+      window.parent.postMessage('gameOver', '*');
+    }
+  </script>
+</body>
+</html>
