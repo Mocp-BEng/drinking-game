@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guess the Country</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+    .hidden {
+      display: none;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .map {
+      margin: 20px 0;
+      position: relative;
+    }
+    img {
+      max-width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .dot {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="game-screen">
+      <h2>Guess the Country!</h2>
+      <p id="country-name"></p>
+      <p>Click on the map where you think the country is located.</p>
+      <div class="map" id="map-container">
+        <img src="A_large_blank_world_map_with_oceans_marked_in_blue.png" alt="World Map" id="map" onclick="makeGuess(event)">
+      </div>
+      <p id="feedback"></p>
+      <button id="next-game-button" class="hidden" onclick="nextGame()">Next Game</button>
+    </div>
+  </div>
+
+  <script src="countries_list.html"></script>
+
+  <script>
+    let selectedCountry;
+    let guessMarker, actualMarker;
+
+    function startGame() {
+      selectedCountry = countries[Math.floor(Math.random() * countries.length)];
+      document.getElementById('country-name').textContent = `Guess the country: ${selectedCountry.name}`;
+    }
+
+    function makeGuess(event) {
+      const map = event.target;
+      const rect = map.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width * 360 - 180;
+      const y = 90 - (event.clientY - rect.top) / rect.height * 180;
+
+      const lat1 = selectedCountry.lat;
+      const lon1 = selectedCountry.lon;
+      const lat2 = y;
+      const lon2 = x;
+
+      const distance = calculateDistance(lat1, lon1, lat2, lon2);
+      document.getElementById('feedback').textContent = `You're ${Math.round(distance)} km away.`;
+
+      if (guessMarker) {
+        guessMarker.remove();
+      }
+      if (actualMarker) {
+        actualMarker.remove();
+      }
+
+      guessMarker = createDot('blue', event.clientX, event.clientY);
+      document.body.appendChild(guessMarker);
+
+      const actualCoords = convertLatLonToXY(lat1, lon1, map);
+      actualMarker = createDot('red', actualCoords.x, actualCoords.y);
+      document.getElementById('map-container').appendChild(actualMarker);
+
+      document.getElementById('next-game-button').classList.remove('hidden');
+    }
+
+    function createDot(color, x, y) {
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      dot.style.backgroundColor = color;
+      dot.style.left = `${x - 5}px`;
+      dot.style.top = `${y - 5}px`;
+      return dot;
+    }
+
+    function convertLatLonToXY(lat, lon, map) {
+      const mapWidth = map.clientWidth;
+      const mapHeight = map.clientHeight;
+      const x = (lon + 180) * (mapWidth / 360);
+      const y = (90 - lat) * (mapHeight / 180);
+      return { x, y };
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = degToRad(lat2 - lat1);
+      const dLon = degToRad(lon2 - lon1);
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(degToRad(lat1)) * Math.cos(degToRad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function degToRad(deg) {
+      return deg * (Math.PI / 180);
+    }
+
+    function nextGame() {
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('next-game-button').classList.add('hidden');
+      if (guessMarker) {
+        guessMarker.remove();
+      }
+      if (actualMarker) {
+        actualMarker.remove();
+      }
+      startGame();
+    }
+
+    window.onload = startGame;
+  </script>
+</body>
+</html>
