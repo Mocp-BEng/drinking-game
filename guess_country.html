@@ -82,29 +82,29 @@
       const rect = map.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width * 360 - 180;
       const y = 90 - (event.clientY - rect.top) / rect.height * 180;
-
+    
       const lat1 = selectedCountry.lat;
       const lon1 = selectedCountry.lon;
       const lat2 = y;
       const lon2 = x;
-
+    
       const distance = calculateDistance(lat1, lon1, lat2, lon2);
       document.getElementById('feedback').textContent = `You're ${Math.round(distance)} km away.`;
-
+    
       if (guessMarker) {
         guessMarker.remove();
       }
       if (actualMarker) {
         actualMarker.remove();
       }
-
+    
       guessMarker = createDot('blue', event.clientX, event.clientY);
       document.body.appendChild(guessMarker);
-
+    
       const actualCoords = convertLatLonToXY(lat1, lon1, map);
       actualMarker = createDot('red', actualCoords.x, actualCoords.y);
       document.getElementById('map-container').appendChild(actualMarker);
-
+    
       document.getElementById('next-game-button').classList.remove('hidden');
     }
 
@@ -126,7 +126,7 @@
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371;
+      const R = 6371; // Radius of the Earth in km
       const dLat = degToRad(lat2 - lat1);
       const dLon = degToRad(lon2 - lon1);
       const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -135,7 +135,7 @@
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c;
     }
-
+    
     function degToRad(deg) {
       return deg * (Math.PI / 180);
     }
