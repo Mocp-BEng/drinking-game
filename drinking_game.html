@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Country Guessing Game</title>
+  <title>Mini Games</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -35,176 +35,13 @@
     button:hover {
       background-color: #0056b3;
     }
-    .map {
-      margin: 20px 0;
-      position: relative;
-    }
-    img {
-      max-width: 100%;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-    }
-    .dot {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div id="start-screen">
-      <h1>Country Guessing Game</h1>
-      <button onclick="startGame()">Start Game</button>
-      <button onclick="startWaldoGame()">Start Find Waldo</button>
-    </div>
-
-    <div id="game-screen" class="hidden">
-      <h2>Guess the Country!</h2>
-      <p id="country-name"></p>
-      <p>Click on the map where you think the country is located.</p>
-      <div class="map" id="map-container">
-        <img src="A_large_blank_world_map_with_oceans_marked_in_blue.png" alt="World Map" id="map" onclick="makeGuess(event)">
-      </div>
-      <p id="feedback"></p>
-      <button id="next-game-button" class="hidden" onclick="nextGame()">Next Game</button>
-    </div>
-
-    <div id="waldo-game-screen" class="hidden">
-      <h2>Find Waldo!</h2>
-      <p>Click on the map where you think Waldo is located.</p>
-      <div class="map" id="waldo-map-container">
-        <img src="find_waldo_map.png" alt="Find Waldo Map" id="waldo-map" onclick="findWaldo(event)">
-      </div>
-      <p id="waldo-feedback"></p>
-      <button id="next-waldo-game-button" class="hidden" onclick="nextWaldoGame()">Next Waldo Game</button>
-    </div>
+    <h1>Mini Games</h1>
+    <button onclick="location.href='guess_country.html'">Play Guess the Country</button>
+    <button onclick="location.href='find_waldo.html'">Play Find Waldo</button>
   </div>
-
-  <script src="countries_list.html"></script>
-
-  <script>
-    let selectedCountry;
-    let guessMarker, actualMarker;
-    const waldoCoords = { x: 150, y: 200 }; // Example coordinates for Waldo
-
-    function startGame() {
-      selectedCountry = countries[Math.floor(Math.random() * countries.length)];
-      document.getElementById('country-name').textContent = `Guess the country: ${selectedCountry.name}`;
-      document.getElementById('start-screen').classList.add('hidden');
-      document.getElementById('game-screen').classList.remove('hidden');
-      document.getElementById('waldo-game-screen').classList.add('hidden');
-    }
-
-    function makeGuess(event) {
-      const map = event.target;
-      const rect = map.getBoundingClientRect();
-      const x = (event.clientX - rect.left) / rect.width * 360 - 180;
-      const y = 90 - (event.clientY - rect.top) / rect.height * 180;
-
-      const lat1 = selectedCountry.lat;
-      const lon1 = selectedCountry.lon;
-      const lat2 = y;
-      const lon2 = x;
-
-      const distance = calculateDistance(lat1, lon1, lat2, lon2);
-      document.getElementById('feedback').textContent = `You're ${Math.round(distance)} km away.`;
-
-      if (guessMarker) {
-        guessMarker.remove();
-      }
-      if (actualMarker) {
-        actualMarker.remove();
-      }
-
-      guessMarker = createDot('blue', event.clientX, event.clientY);
-      document.body.appendChild(guessMarker);
-
-      const actualCoords = convertLatLonToXY(lat1, lon1, map);
-      actualMarker = createDot('red', actualCoords.x, actualCoords.y);
-      document.getElementById('map-container').appendChild(actualMarker);
-
-      document.getElementById('next-game-button').classList.remove('hidden');
-    }
-
-    function createDot(color, x, y) {
-      const dot = document.createElement('div');
-      dot.className = 'dot';
-      dot.style.backgroundColor = color;
-      dot.style.left = `${x - 5}px`;
-      dot.style.top = `${y - 5}px`;
-      return dot;
-    }
-
-    function convertLatLonToXY(lat, lon, map) {
-      const mapWidth = map.clientWidth;
-      const mapHeight = map.clientHeight;
-      const x = (lon + 180) * (mapWidth / 360);
-      const y = (90 - lat) * (mapHeight / 180);
-      return { x, y };
-    }
-
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371;
-      const dLat = degToRad(lat2 - lat1);
-      const dLon = degToRad(lon2 - lon1);
-      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(degToRad(lat1)) * Math.cos(degToRad(lat2)) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c;
-    }
-
-    function degToRad(deg) {
-      return deg * (Math.PI / 180);
-    }
-
-    function nextGame() {
-      document.getElementById('feedback').textContent = '';
-      document.getElementById('next-game-button').classList.add('hidden');
-      if (guessMarker) {
-        guessMarker.remove();
-      }
-      if (actualMarker) {
-        actualMarker.remove();
-      }
-      startGame();
-    }
-
-    function startWaldoGame() {
-      document.getElementById('start-screen').classList.add('hidden');
-      document.getElementById('game-screen').classList.add('hidden');
-      document.getElementById('waldo-game-screen').classList.remove('hidden');
-    }
-
-    function findWaldo(event) {
-      const map = event.target;
-      const rect = map.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-
-      const distance = Math.hypot(x - waldoCoords.x, y - waldoCoords.y);
-      document.getElementById('waldo-feedback').textContent = distance < 20 ? "You found Waldo!" : "Try again!";
-
-      if (guessMarker) {
-        guessMarker.remove();
-      }
-
-      guessMarker = createDot('blue', event.clientX, event.clientY);
-      document.body.appendChild(guessMarker);
-
-      document.getElementById('next-waldo-game-button').classList.remove('hidden');
-    }
-
-    function nextWaldoGame() {
-      document.getElementById('waldo-feedback').textContent = '';
-      document.getElementById('next-waldo-game-button').classList.add('hidden');
-      if (guessMarker) {
-        guessMarker.remove();
-      }
-      startWaldoGame();
-    }
-  </script>
 </body>
 </html>
