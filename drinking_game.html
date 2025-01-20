@@ -50,10 +50,6 @@
       height: 10px;
       border-radius: 50%;
     }
-    .line {
-      position: absolute;
-      background-color: black;
-    }
   </style>
 </head>
 <body>
@@ -71,12 +67,7 @@
         <img src="A_large_blank_world_map_with_oceans_marked_in_blue.png" alt="World Map" id="map" onclick="makeGuess(event)">
       </div>
       <p id="feedback"></p>
-    </div>
-
-    <div id="result-screen" class="hidden">
-      <h2>Results</h2>
-      <p id="result-message"></p>
-      <button onclick="restartGame()">Play Again</button>
+      <button id="next-game-button" class="hidden" onclick="nextGame()">Next Game</button>
     </div>
   </div>
 
@@ -84,7 +75,7 @@
 
   <script>
     let selectedCountry;
-    let guessMarker, actualMarker, line;
+    let guessMarker, actualMarker;
 
     function startGame() {
       selectedCountry = countries[Math.floor(Math.random() * countries.length)];
@@ -113,9 +104,6 @@
       if (actualMarker) {
         actualMarker.remove();
       }
-      if (line) {
-        line.remove();
-      }
 
       guessMarker = createDot('blue', event.clientX, event.clientY);
       document.body.appendChild(guessMarker);
@@ -124,10 +112,7 @@
       actualMarker = createDot('red', actualCoords.x, actualCoords.y);
       document.getElementById('map-container').appendChild(actualMarker);
 
-      line = createLine(event.clientX, event.clientY, actualCoords.x, actualCoords.y);
-      document.body.appendChild(line);
-
-      endGame(distance);
+      document.getElementById('next-game-button').classList.remove('hidden');
     }
 
     function createDot(color, x, y) {
@@ -137,18 +122,6 @@
       dot.style.left = `${x - 5}px`;
       dot.style.top = `${y - 5}px`;
       return dot;
-    }
-
-    function createLine(x1, y1, x2, y2) {
-      const line = document.createElement('div');
-      line.className = 'line';
-      line.style.width = '2px';
-      line.style.height = `${Math.hypot(x2 - x1, y2 - y1)}px`;
-      line.style.transformOrigin = 'top left';
-      line.style.transform = `rotate(${Math.atan2(y2 - y1, x2 - x1)}rad)`;
-      line.style.left = `${x1}px`;
-      line.style.top = `${y1}px`;
-      return line;
     }
 
     function convertLatLonToXY(lat, lon, map) {
@@ -174,24 +147,16 @@
       return deg * (Math.PI / 180);
     }
 
-    function endGame(distance) {
-      document.getElementById('result-message').textContent = distance < 1000 ? 'You guessed correctly!' : `Too far! You're ${Math.round(distance)} km away.`;
-      document.getElementById('result-screen').classList.remove('hidden');
-    }
-
-    function restartGame() {
-      document.getElementById('result-screen').classList.add('hidden');
-      document.getElementById('start-screen').classList.remove('hidden');
+    function nextGame() {
       document.getElementById('feedback').textContent = '';
+      document.getElementById('next-game-button').classList.add('hidden');
       if (guessMarker) {
         guessMarker.remove();
       }
       if (actualMarker) {
         actualMarker.remove();
       }
-      if (line) {
-        line.remove();
-      }
+      startGame();
     }
   </script>
 </body>
