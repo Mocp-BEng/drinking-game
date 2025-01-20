@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Drinking Game</title>
+  <title>Country Guessing Game</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -47,17 +47,14 @@
 </head>
 <body>
   <div class="container">
-    <!-- Start Screen -->
     <div id="start-screen">
-      <h1>Drinking Game</h1>
-      <p>Guess the country on the map! The loser drinks.</p>
+      <h1>Country Guessing Game</h1>
+      <p id="country-name"></p>
       <button onclick="startGame()">Start Game</button>
     </div>
 
-    <!-- Game Screen -->
     <div id="game-screen" class="hidden">
       <h2>Guess the Country!</h2>
-      <p id="country-name"></p>
       <p>Click on the map where you think the country is located.</p>
       <div class="map">
         <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/BlankMap-World-noborders.png" alt="World Map" id="map" onclick="makeGuess(event)">
@@ -65,7 +62,6 @@
       <p id="feedback"></p>
     </div>
 
-    <!-- Result Screen -->
     <div id="result-screen" class="hidden">
       <h2>Results</h2>
       <p id="result-message"></p>
@@ -75,55 +71,58 @@
 
   <script>
     const countries = [
-      { name: 'Brazil', x: 35.0, y: 67.5 },
-      { name: 'Australia', x: 85.0, y: 85.0 },
-      { name: 'Canada', x: 25.0, y: 20.0 },
-      { name: 'Russia', x: 70.0, y: 20.0 },
-      { name: 'India', x: 65.0, y: 55.0 }
+      { name: "Canada", lat: 56.1304, lon: -106.3468 },
+      { name: "Brazil", lat: -14.2350, lon: -51.9253 },
+      { name: "Japan", lat: 36.2048, lon: 138.2529 },
+      { name: "Germany", lat: 51.1657, lon: 10.4515 },
+      { name: "Australia", lat: -25.2744, lon: 133.7751 }
     ];
-    let currentCountry;
-    let correctLocation;
+
+    let selectedCountry;
 
     function startGame() {
+      selectedCountry = countries[Math.floor(Math.random() * countries.length)];
+      document.getElementById('country-name').textContent = `Guess the country: ${selectedCountry.name}`;
       document.getElementById('start-screen').classList.add('hidden');
       document.getElementById('game-screen').classList.remove('hidden');
-      selectRandomCountry();
-    }
-
-    function selectRandomCountry() {
-      const randomIndex = Math.floor(Math.random() * countries.length);
-      currentCountry = countries[randomIndex];
-      correctLocation = { x: currentCountry.x, y: currentCountry.y };
-      document.getElementById('country-name').textContent = `Find: ${currentCountry.name}`;
     }
 
     function makeGuess(event) {
       const map = event.target;
       const rect = map.getBoundingClientRect();
-
       const x = ((event.clientX - rect.left) / rect.width) * 100;
       const y = ((event.clientY - rect.top) / rect.height) * 100;
 
-      const distance = calculateDistance(x, y, correctLocation.x, correctLocation.y);
+      // Coordinates of the selected country
+      const lat1 = selectedCountry.lat;
+      const lon1 = selectedCountry.lon;
+      const lat2 = (y - 50) * 1.8; // Mock conversion for this example
+      const lon2 = (x - 50) * 3.6; // Mock conversion for this example
 
-      if (distance < 10) {
-        document.getElementById('feedback').textContent = 'Correct! You guessed it!';
-        endGame('You guessed the correct location! The other player drinks!');
-      } else {
-        document.getElementById('feedback').textContent = `Close, but not correct! You’re ${distance.toFixed(2)} km away.`;
-        endGame('You missed! You drink!');
-      }
+      const distance = calculateDistance(lat1, lon1, lat2, lon2);
+      document.getElementById('feedback').textContent = `You're ${Math.round(distance)} km away.`;
+      endGame(distance);
     }
 
-    function calculateDistance(x1, y1, x2, y2) {
-      const dx = x1 - x2;
-      const dy = y1 - y2;
-      return Math.sqrt(dx * dx + dy * dy) * 100; // Assuming the map is scaled to 100x100 units
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Radius of the Earth in km
+      const dLat = degToRad(lat2 - lat1);
+      const dLon = degToRad(lon2 - lon1);
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(degToRad(lat1)) * Math.cos(degToRad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c; // Distance in km
     }
 
-    function endGame(message) {
+    function degToRad(deg) {
+      return deg * (Math.PI / 180);
+    }
+
+    function endGame(distance) {
       document.getElementById('game-screen').classList.add('hidden');
       document.getElementById('result-screen').classList.remove('hidden');
+      const message = distance < 1000 ? 'You guessed correctly!' : `Too far! You're ${Math.round(distance)} km away.`;
       document.getElementById('result-message').textContent = message;
     }
 
