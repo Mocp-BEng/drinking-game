@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Country Guessing Game</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -38,10 +37,11 @@
     }
     .map {
       margin: 20px 0;
-      height: 400px;
     }
-    #map {
-      height: 400px;
+    img {
+      max-width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 5px;
     }
   </style>
 </head>
@@ -56,7 +56,9 @@
       <h2>Guess the Country!</h2>
       <p id="country-name"></p>
       <p>Click on the map where you think the country is located.</p>
-      <div id="map"></div>
+      <div class="map">
+        <img src="A_large_blank_world_map_with_oceans_marked_in_blue.png" alt="World Map" id="map" onclick="makeGuess(event)">
+      </div>
       <p id="feedback"></p>
     </div>
 
@@ -68,59 +70,85 @@
     </div>
   </div>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="countries_list.html"></script>
 
   <script>
     let selectedCountry;
-    let map, marker, circle;
+    let guessMarker, actualMarker, line;
 
     function startGame() {
       selectedCountry = countries[Math.floor(Math.random() * countries.length)];
       document.getElementById('country-name').textContent = `Guess the country: ${selectedCountry.name}`;
       document.getElementById('start-screen').classList.add('hidden');
       document.getElementById('game-screen').classList.remove('hidden');
-      
-      // Initialize map
-      if (!map) {
-        map = L.map('map').setView([20, 0], 2);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        map.on('click', makeGuess);
-      }
     }
 
     function makeGuess(event) {
-      const lat = event.latlng.lat;
-      const lon = event.latlng.lng;
+      const map = event.target;
+      const rect = map.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width * 360 - 180;
+      const y = 90 - (event.clientY - rect.top) / rect.height * 180;
 
       const lat1 = selectedCountry.lat;
       const lon1 = selectedCountry.lon;
+      const lat2 = y;
+      const lon2 = x;
 
-      const distance = calculateDistance(lat1, lon1, lat, lon);
+      const distance = calculateDistance(lat1, lon1, lat2, lon2);
       document.getElementById('feedback').textContent = `You're ${Math.round(distance)} km away.`;
 
-      if (marker) {
-        map.removeLayer(marker);
+      if (guessMarker) {
+        guessMarker.remove();
       }
-      if (circle) {
-        map.removeLayer(circle);
+      if (actualMarker) {
+        actualMarker.remove();
+      }
+      if (line) {
+        line.remove();
       }
 
-      marker = L.marker([lat1, lon1]).addTo(map)
-        .bindPopup(`The correct country was: ${selectedCountry.name}`)
-        .openPopup();
+      guessMarker = document.createElement('div');
+      guessMarker.style.position = 'absolute';
+      guessMarker.style.width = '10px';
+      guessMarker.style.height = '10px';
+      guessMarker.style.backgroundColor = 'blue';
+      guessMarker.style.borderRadius = '50%';
+      guessMarker.style.left = `${event.clientX - 5}px`;
+      guessMarker.style.top = `${event.clientY - 5}px`;
+      document.body.appendChild(guessMarker);
 
-      circle = L.circle([lat1, lon1], {
-        color: 'red',
-        fillColor: '#f03',
-        fillOpacity: 0.5,
-        radius: 500000
-      }).addTo(map);
+      const actualPoint = document.createElement('div');
+      actualPoint.style.position = 'absolute';
+      actualPoint.style.width = '10px';
+      actualPoint.style.height = '10px';
+      actualPoint.style.backgroundColor = 'red';
+      actualPoint.style.borderRadius = '50%';
+      const actualCoords = convertLatLonToXY(lat1, lon1, map);
+      actualPoint.style.left = `${actualCoords.x - 5}px`;
+      actualPoint.style.top = `${actualCoords.y - 5}px`;
+      document.body.appendChild(actualPoint);
+      actualMarker = actualPoint;
+
+      line = document.createElement('div');
+      line.style.position = 'absolute';
+      line.style.width = '2px';
+      line.style.height = `${Math.hypot(actualCoords.x - event.clientX, actualCoords.y - event.clientY)}px`;
+      line.style.backgroundColor = 'black';
+      line.style.transformOrigin = 'top left';
+      line.style.transform = `rotate(${Math.atan2(actualCoords.y - event.clientY, actualCoords.x - event.clientX)}rad)`;
+      line.style.left = `${event.clientX}px`;
+      line.style.top = `${event.clientY}px`;
+      document.body.appendChild(line);
 
       endGame(distance);
+    }
+
+    function convertLatLonToXY(lat, lon, map) {
+      const mapWidth = map.clientWidth;
+      const mapHeight = map.clientHeight;
+      const x = (lon + 180) * (mapWidth / 360);
+      const y = (90 - lat) * (mapHeight / 180);
+      return { x, y };
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -150,11 +178,14 @@
       document.getElementById('start-screen').classList.remove('hidden');
       document.getElementById('feedback').textContent = '';
       document.getElementById('correct-country').textContent = '';
-      if (marker) {
-        map.removeLayer(marker);
+      if (guessMarker) {
+        guessMarker.remove();
       }
-      if (circle) {
-        map.removeLayer(circle);
+      if (actualMarker) {
+        actualMarker.remove();
+      }
+      if (line) {
+        line.remove();
       }
     }
   </script>
