@@ -35,12 +35,13 @@
     button:hover {
       background-color: #0056b3;
     }
-    .map {
-      margin: 20px 0;
-      position: relative;
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      justify-content: center;
     }
     .dot {
-      position: absolute;
       width: 10px;
       height: 10px;
       background-color: red;
@@ -53,7 +54,7 @@
     <div id="dots-game-screen">
       <h2>Guess the Number of Dots!</h2>
       <p>Count the dots and enter your guess.</p>
-      <div class="map" id="dots-map-container">
+      <div class="grid-container" id="dots-map-container">
       </div>
       <input type="number" id="dots-guess" placeholder="Enter your guess">
       <button onclick="checkGuess()">Submit Guess</button>
@@ -73,8 +74,6 @@
       for (let i = 0; i < numberOfDots; i++) {
         const dot = document.createElement('div');
         dot.className = 'dot';
-        dot.style.left = `${Math.random() * 90}%`;
-        dot.style.top = `${Math.random() * 90}%`;
         container.appendChild(dot);
       }
 
