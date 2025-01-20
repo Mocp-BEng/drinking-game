@@ -122,7 +122,7 @@
 
       const actualCoords = convertLatLonToXY(lat1, lon1, map);
       actualMarker = createDot('red', actualCoords.x, actualCoords.y);
-      document.body.appendChild(actualMarker);
+      document.getElementById('map-container').appendChild(actualMarker);
 
       line = createLine(event.clientX, event.clientY, actualCoords.x, actualCoords.y);
       document.body.appendChild(line);
