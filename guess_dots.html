@@ -62,7 +62,7 @@
       <input type="text" id="dots-guess" placeholder="Enter your guess">
       <button onclick="checkGuess()">Submit Guess</button>
       <p id="dots-feedback"></p>
-      <button id="next-dots-game-button" class="hidden" onclick="nextDotsGame()">Next Game</button>
+      <button id="next-dots-game-button" class="hidden" onclick="nextGame()">Next Game</button>
     </div>
   </div>
 
@@ -98,8 +98,8 @@
       document.getElementById('next-dots-game-button').classList.remove('hidden');
     }
 
-    function nextDotsGame() {
-      startDotsGame();
+    function nextGame() {
+      window.parent.postMessage('gameOver', '*');
     }
 
     window.onload = startDotsGame;
