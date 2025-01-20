@@ -66,7 +66,7 @@
     </div>
   </div>
 
-  <script src="countries_list.html"></script>
+  <script src="countries_list.js"></script>
 
   <script>
     let selectedCountry;
@@ -141,15 +141,7 @@
     }
 
     function nextGame() {
-      document.getElementById('feedback').textContent = '';
-      document.getElementById('next-game-button').classList.add('hidden');
-      if (guessMarker) {
-        guessMarker.remove();
-      }
-      if (actualMarker) {
-        actualMarker.remove();
-      }
-      startGame();
+      window.parent.postMessage('gameOver', '*');
     }
 
     window.onload = startGame;
