@@ -57,6 +57,7 @@
     <!-- Game Screen -->
     <div id="game-screen" class="hidden">
       <h2>Guess the Country!</h2>
+      <p id="country-name"></p>
       <p>Click on the map where you think the country is located.</p>
       <div class="map">
         <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/BlankMap-World-noborders.png" alt="World Map" id="map" onclick="makeGuess(event)">
@@ -73,32 +74,51 @@
   </div>
 
   <script>
-    let correctLocation = { x: 50, y: 50 }; // Example correct location on the map
+    const countries = [
+      { name: 'Brazil', x: 35.0, y: 67.5 },
+      { name: 'Australia', x: 85.0, y: 85.0 },
+      { name: 'Canada', x: 25.0, y: 20.0 },
+      { name: 'Russia', x: 70.0, y: 20.0 },
+      { name: 'India', x: 65.0, y: 55.0 }
+    ];
+    let currentCountry;
+    let correctLocation;
 
     function startGame() {
       document.getElementById('start-screen').classList.add('hidden');
       document.getElementById('game-screen').classList.remove('hidden');
+      selectRandomCountry();
+    }
+
+    function selectRandomCountry() {
+      const randomIndex = Math.floor(Math.random() * countries.length);
+      currentCountry = countries[randomIndex];
+      correctLocation = { x: currentCountry.x, y: currentCountry.y };
+      document.getElementById('country-name').textContent = `Find: ${currentCountry.name}`;
     }
 
     function makeGuess(event) {
       const map = event.target;
       const rect = map.getBoundingClientRect();
 
-      // Calculate click coordinates relative to the map
       const x = ((event.clientX - rect.left) / rect.width) * 100;
       const y = ((event.clientY - rect.top) / rect.height) * 100;
 
-      const distance = Math.sqrt(
-        Math.pow(x - correctLocation.x, 2) + Math.pow(y - correctLocation.y, 2)
-      );
+      const distance = calculateDistance(x, y, correctLocation.x, correctLocation.y);
 
       if (distance < 10) {
         document.getElementById('feedback').textContent = 'Correct! You guessed it!';
         endGame('You guessed the correct location! The other player drinks!');
       } else {
-        document.getElementById('feedback').textContent = `Close, but not correct! (${distance.toFixed(2)} units away)`;
+        document.getElementById('feedback').textContent = `Close, but not correct! You’re ${distance.toFixed(2)} km away.`;
         endGame('You missed! You drink!');
       }
+    }
+
+    function calculateDistance(x1, y1, x2, y2) {
+      const dx = x1 - x2;
+      const dy = y1 - y2;
+      return Math.sqrt(dx * dx + dy * dy) * 100; // Assuming the map is scaled to 100x100 units
     }
 
     function endGame(message) {
