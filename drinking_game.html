@@ -50,7 +50,18 @@
       location.href = randomGame;
     }
 
-    window.onload = startRandomGame;
+    function switchGameAfterRound() {
+      const games = ['guess_country.html', 'guess_dots.html'];
+      const randomGame = games[Math.floor(Math.random() * games.length)];
+      setTimeout(() => {
+        location.href = randomGame;
+      }, 5000); // Switch game after 5 seconds
+    }
+
+    window.onload = function() {
+      startRandomGame();
+      switchGameAfterRound();
+    };
   </script>
 </body>
 </html>
