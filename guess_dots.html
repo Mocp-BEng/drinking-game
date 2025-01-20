@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guess the Dots</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+    .hidden {
+      display: none;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .map {
+      margin: 20px 0;
+      position: relative;
+    }
+    .dot {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="dots-game-screen">
+      <h2>Guess the Number of Dots!</h2>
+      <p>Count the dots and enter your guess.</p>
+      <div class="map" id="dots-map-container">
+      </div>
+      <input type="number" id="dots-guess" placeholder="Enter your guess">
+      <button onclick="checkGuess()">Submit Guess</button>
+      <p id="dots-feedback"></p>
+      <button id="next-dots-game-button" class="hidden" onclick="nextDotsGame()">Next Game</button>
+    </div>
+  </div>
+
+  <script>
+    let numberOfDots;
+
+    function startDotsGame() {
+      const container = document.getElementById('dots-map-container');
+      container.innerHTML = '';
+      numberOfDots = Math.floor(Math.random() * 20) + 1;
+
+      for (let i = 0; i < numberOfDots; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dot.style.left = `${Math.random() * 90}%`;
+        dot.style.top = `${Math.random() * 90}%`;
+        container.appendChild(dot);
+      }
+
+      document.getElementById('dots-feedback').textContent = '';
+      document.getElementById('next-dots-game-button').classList.add('hidden');
+      document.getElementById('dots-guess').value = '';
+    }
+
+    function checkGuess() {
+      const guess = document.getElementById('dots-guess').value;
+      const feedback = document.getElementById('dots-feedback');
+      if (parseInt(guess) === numberOfDots) {
+        feedback.textContent = 'Correct! You guessed the right number of dots.';
+      } else {
+        feedback.textContent = `Incorrect. The correct number was ${numberOfDots}.`;
+      }
+      document.getElementById('next-dots-game-button').classList.remove('hidden');
+    }
+
+    function nextDotsGame() {
+      startDotsGame();
+    }
+
+    window.onload = startDotsGame;
+  </script>
+</body>
+</html>
