@@ -37,11 +37,22 @@
     }
     .map {
       margin: 20px 0;
+      position: relative;
     }
     img {
       max-width: 100%;
       border: 1px solid #ddd;
       border-radius: 5px;
+    }
+    .dot {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .line {
+      position: absolute;
+      background-color: black;
     }
   </style>
 </head>
@@ -56,7 +67,7 @@
       <h2>Guess the Country!</h2>
       <p id="country-name"></p>
       <p>Click on the map where you think the country is located.</p>
-      <div class="map">
+      <div class="map" id="map-container">
         <img src="A_large_blank_world_map_with_oceans_marked_in_blue.png" alt="World Map" id="map" onclick="makeGuess(event)">
       </div>
       <p id="feedback"></p>
@@ -65,7 +76,6 @@
     <div id="result-screen" class="hidden">
       <h2>Results</h2>
       <p id="result-message"></p>
-      <p id="correct-country"></p>
       <button onclick="restartGame()">Play Again</button>
     </div>
   </div>
@@ -107,40 +117,38 @@
         line.remove();
       }
 
-      guessMarker = document.createElement('div');
-      guessMarker.style.position = 'absolute';
-      guessMarker.style.width = '10px';
-      guessMarker.style.height = '10px';
-      guessMarker.style.backgroundColor = 'blue';
-      guessMarker.style.borderRadius = '50%';
-      guessMarker.style.left = `${event.clientX - 5}px`;
-      guessMarker.style.top = `${event.clientY - 5}px`;
+      guessMarker = createDot('blue', event.clientX, event.clientY);
       document.body.appendChild(guessMarker);
 
-      const actualPoint = document.createElement('div');
-      actualPoint.style.position = 'absolute';
-      actualPoint.style.width = '10px';
-      actualPoint.style.height = '10px';
-      actualPoint.style.backgroundColor = 'red';
-      actualPoint.style.borderRadius = '50%';
       const actualCoords = convertLatLonToXY(lat1, lon1, map);
-      actualPoint.style.left = `${actualCoords.x - 5}px`;
-      actualPoint.style.top = `${actualCoords.y - 5}px`;
-      document.body.appendChild(actualPoint);
-      actualMarker = actualPoint;
+      actualMarker = createDot('red', actualCoords.x, actualCoords.y);
+      document.body.appendChild(actualMarker);
 
-      line = document.createElement('div');
-      line.style.position = 'absolute';
-      line.style.width = '2px';
-      line.style.height = `${Math.hypot(actualCoords.x - event.clientX, actualCoords.y - event.clientY)}px`;
-      line.style.backgroundColor = 'black';
-      line.style.transformOrigin = 'top left';
-      line.style.transform = `rotate(${Math.atan2(actualCoords.y - event.clientY, actualCoords.x - event.clientX)}rad)`;
-      line.style.left = `${event.clientX}px`;
-      line.style.top = `${event.clientY}px`;
+      line = createLine(event.clientX, event.clientY, actualCoords.x, actualCoords.y);
       document.body.appendChild(line);
 
       endGame(distance);
+    }
+
+    function createDot(color, x, y) {
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      dot.style.backgroundColor = color;
+      dot.style.left = `${x - 5}px`;
+      dot.style.top = `${y - 5}px`;
+      return dot;
+    }
+
+    function createLine(x1, y1, x2, y2) {
+      const line = document.createElement('div');
+      line.className = 'line';
+      line.style.width = '2px';
+      line.style.height = `${Math.hypot(x2 - x1, y2 - y1)}px`;
+      line.style.transformOrigin = 'top left';
+      line.style.transform = `rotate(${Math.atan2(y2 - y1, x2 - x1)}rad)`;
+      line.style.left = `${x1}px`;
+      line.style.top = `${y1}px`;
+      return line;
     }
 
     function convertLatLonToXY(lat, lon, map) {
@@ -167,17 +175,14 @@
     }
 
     function endGame(distance) {
-      document.getElementById('game-screen').classList.add('hidden');
+      document.getElementById('result-message').textContent = distance < 1000 ? 'You guessed correctly!' : `Too far! You're ${Math.round(distance)} km away.`;
       document.getElementById('result-screen').classList.remove('hidden');
-      const message = distance < 1000 ? 'You guessed correctly!' : `Too far! You're ${Math.round(distance)} km away.`;
-      document.getElementById('result-message').textContent = message;
     }
 
     function restartGame() {
       document.getElementById('result-screen').classList.add('hidden');
       document.getElementById('start-screen').classList.remove('hidden');
       document.getElementById('feedback').textContent = '';
-      document.getElementById('correct-country').textContent = '';
       if (guessMarker) {
         guessMarker.remove();
       }
