@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scribble Shapes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas {
+      border: 1px solid #000;
+      background-color: #fff;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h2>Scribble Shapes</h2>
+    <p id="shape-name"></p>
+    <canvas id="canvas" width="300" height="300"></canvas>
+    <button id="start-btn" class="hidden" onclick="startGame()">Restart</button>
+    <p id="feedback" class="hidden"></p>
+  </div>
+
+  <script>
+    const shapes = ['circle', 'square', 'triangle'];
+    let currentShape;
+    let context;
+    let isDrawing = false;
+    let startX, startY, endX, endY;
+
+    function startGame() {
+      document.getElementById('start-btn').classList.add('hidden');
+      document.getElementById('feedback').classList.add('hidden');
+      context = document.getElementById('canvas').getContext('2d');
+      context.clearRect(0, 0, 300, 300);
+      currentShape = shapes[Math.floor(Math.random() * shapes.length)];
+      document.getElementById('shape-name').textContent = `Draw a ${currentShape}`;
+      document.getElementById('canvas').addEventListener('mousedown', startDrawing);
+      document.getElementById('canvas').addEventListener('mousemove', draw);
+      document.getElementById('canvas').addEventListener('mouseup', endDrawing);
+      setTimeout(endGame, 10000);
+    }
+
+    function startDrawing(event) {
+      isDrawing = true;
+      startX = event.offsetX;
+      startY = event.offsetY;
+    }
+
+    function draw(event) {
+      if (!isDrawing) return;
+      endX = event.offsetX;
+      endY = event.offsetY;
+      context.beginPath();
+      context.moveTo(startX, startY);
+      context.lineTo(endX, endY);
+      context.stroke();
+      startX = endX;
+      startY = endY;
+    }
+
+    function endDrawing() {
+      isDrawing = false;
+    }
+
+    function endGame() {
+      document.getElementById('canvas').removeEventListener('mousedown', startDrawing);
+      document.getElementById('canvas').removeEventListener('mousemove', draw);
+      document.getElementById('canvas').removeEventListener('mouseup', endDrawing);
+      document.getElementById('feedback').textContent = 'Time is up! You lose.';
+      document.getElementById('feedback').classList.remove('hidden');
+      document.getElementById('start-btn').classList.remove('hidden');
+      window.parent.postMessage('gameOver', '*');
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
