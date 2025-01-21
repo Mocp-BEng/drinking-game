@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odd One Out</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .hidden {
+      display: none;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+    .emoji {
+      font-size: 2rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h2>Odd One Out</h2>
+    <div id="grid-container" class="grid"></div>
+    <button id="start-btn" class="hidden" onclick="startGame()">Restart</button>
+    <p id="feedback" class="hidden"></p>
+  </div>
+
+  <script>
+    const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇'];
+    let correctEmoji;
+
+    function startGame() {
+      document.getElementById('start-btn').classList.add('hidden');
+      document.getElementById('feedback').classList.add('hidden');
+      generateGrid();
+      setTimeout(endGame, 5000);
+    }
+
+    function generateGrid() {
+      const gridContainer = document.getElementById('grid-container');
+      gridContainer.innerHTML = '';
+      const randomIndex = Math.floor(Math.random() * emojis.length);
+      correctEmoji = emojis[randomIndex];
+      for (let i = 0; i < 24; i++) {
+        const emoji = i === 12 ? correctEmoji : emojis[Math.floor(Math.random() * emojis.length)];
+        const emojiElement = document.createElement('div');
+        emojiElement.textContent = emoji;
+        emojiElement.classList.add('emoji');
+        emojiElement.onclick = () => checkEmoji(emoji);
+        gridContainer.appendChild(emojiElement);
+      }
+    }
+
+    function checkEmoji(selectedEmoji) {
+      if (selectedEmoji === correctEmoji) {
+        document.getElementById('feedback').textContent = 'Correct! You win.';
+      } else {
+        document.getElementById('feedback').textContent = 'Wrong! You lose.';
+      }
+      document.getElementById('feedback').classList.remove('hidden');
+      document.getElementById('start-btn').classList.remove('hidden');
+      window.parent.postMessage('gameOver', '*');
+    }
+
+    function endGame() {
+      document.getElementById('feedback').textContent = 'Time is up! You lose.';
+      document.getElementById('feedback').classList.remove('hidden');
+      document.getElementById('start-btn').classList.remove('hidden');
+      window.parent.postMessage('gameOver', '*');
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
