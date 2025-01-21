@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What's Missing?</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .hidden {
+      display: none;
+    }
+    .objects {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    .object {
+      font-size: 2rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h2>What's Missing?</h2>
+    <div class="objects" id="objects-container"></div>
+    <button id="start-btn" class="hidden" onclick="startGame()">Restart</button>
+    <p id="feedback" class="hidden"></p>
+  </div>
+
+  <script>
+    const objects = ['🍎', '🍌', '🍇', '🍉', '🍒'];
+    let missingObject;
+
+    function startGame() {
+      document.getElementById('start-btn').classList.add('hidden');
+      document.getElementById('feedback').classList.add('hidden');
+      displayObjects();
+      setTimeout(removeObject, 3000);
+    }
+
+    function displayObjects() {
+      const objectsContainer = document.getElementById('objects-container');
+      objectsContainer.innerHTML = '';
+      objects.forEach(object => {
+        const objectElement = document.createElement('div');
+        objectElement.textContent = object;
+        objectElement.classList.add('object');
+        objectsContainer.appendChild(objectElement);
+      });
+    }
+
+    function removeObject() {
+      missingObject = objects[Math.floor(Math.random() * objects.length)];
+      const objectsContainer = document.getElementById('objects-container');
+      objectsContainer.innerHTML = '';
+      objects.filter(object => object !== missingObject).forEach(object => {
+        const objectElement = document.createElement('div');
+        objectElement.textContent = object;
+        objectElement.classList.add('object');
+        objectElement.onclick = () => checkObject(object);
+        objectsContainer.appendChild(objectElement);
+      });
+    }
+
+    function checkObject(selectedObject) {
+      if (selectedObject === missingObject) {
+        document.getElementById('feedback').textContent = 'Correct! You win.';
+      } else {
+        document.getElementById('feedback').textContent = 'Wrong! You lose.';
+      }
+      document.getElementById('feedback').classList.remove('hidden');
+      document.getElementById('start-btn').classList.remove('hidden');
+      window.parent.postMessage('gameOver', '*');
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
