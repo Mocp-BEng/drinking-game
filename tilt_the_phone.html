@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tilt the Phone</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    #ball {
+      width: 50px;
+      height: 50px;
+      background-color: #007BFF;
+      border-radius: 50%;
+      position: absolute;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h2>Tilt the Phone</h2>
+    <div id="ball"></div>
+    <button id="start-btn" class="hidden" onclick="startGame()">Restart</button>
+    <p id="feedback" class="hidden"></p>
+  </div>
+
+  <script>
+    let ball;
+    let x = 50;
+    let y = 50;
+
+    function startGame() {
+      document.getElementById('start-btn').classList.add('hidden');
+      document.getElementById('feedback').classList.add('hidden');
+      ball = document.getElementById('ball');
+      window.addEventListener('deviceorientation', handleOrientation);
+      setTimeout(endGame, 10000);
+    }
+
+    function handleOrientation(event) {
+      const xMax = window.innerWidth - ball.offsetWidth;
+      const yMax = window.innerHeight - ball.offsetHeight;
+      x += event.gamma;
+      y += event.beta;
+      if (x < 0) x = 0;
+      if (x > xMax) x = xMax;
+      if (y < 0) y = 0;
+      if (y > yMax) y = yMax;
+      ball.style.left = x + 'px';
+      ball.style.top = y + 'px';
+    }
+
+    function endGame() {
+      window.removeEventListener('deviceorientation', handleOrientation);
+      document.getElementById('feedback').textContent = 'Time is up! You lose.';
+      document.getElementById('feedback').classList.remove('hidden');
+      document.getElementById('start-btn').classList.remove('hidden');
+      window.parent.postMessage('gameOver', '*');
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
