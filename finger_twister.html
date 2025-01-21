@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finger Twister</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .hidden {
+      display: none;
+    }
+    .instruction {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h2>Finger Twister</h2>
+    <p id="instruction" class="instruction"></p>
+    <button id="start-btn" class="hidden" onclick="startGame()">Restart</button>
+    <p id="feedback" class="hidden"></p>
+  </div>
+
+  <script>
+    const instructions = [
+      'Place your right thumb in the top-left corner.',
+      'Place your left index finger in the bottom-right corner.',
+      'Place your right pinky in the top-right corner.',
+      'Place your left thumb in the bottom-left corner.'
+    ];
+    let currentInstruction;
+
+    function startGame() {
+      document.getElementById('start-btn').classList.add('hidden');
+      document.getElementById('feedback').classList.add('hidden');
+      showInstruction();
+      setTimeout(endGame, 10000);
+    }
+
+    function showInstruction() {
+      currentInstruction = instructions[Math.floor(Math.random() * instructions.length)];
+      document.getElementById('instruction').textContent = currentInstruction;
+    }
+
+    function endGame() {
+      document.getElementById('feedback').textContent = 'Time is up! You lose.';
+      document.getElementById('feedback').classList.remove('hidden');
+      document.getElementById('start-btn').classList.remove('hidden');
+      window.parent.postMessage('gameOver', '*');
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
