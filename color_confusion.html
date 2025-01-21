@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Confusion</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .hidden {
+      display: none;
+    }
+    .start-btn, .color-btn {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .start-btn:hover, .color-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h2>Color Confusion</h2>
+    <p id="color-name"></p>
+    <div id="buttons-container" class="hidden">
+      <button class="color-btn" onclick="checkColor('red')">Red</button>
+      <button class="color-btn" onclick="checkColor('green')">Green</button>
+      <button class="color-btn" onclick="checkColor('blue')">Blue</button>
+      <button class="color-btn" onclick="checkColor('yellow')">Yellow</button>
+    </div>
+    <button id="start-btn" class="start-btn" onclick="startGame()">Start</button>
+    <p id="feedback" class="hidden"></p>
+  </div>
+
+  <script>
+    const colors = ['red', 'green', 'blue', 'yellow'];
+    let correctColor;
+
+    function startGame() {
+      document.getElementById('start-btn').classList.add('hidden');
+      document.getElementById('buttons-container').classList.remove('hidden');
+      displayRandomColor();
+    }
+
+    function displayRandomColor() {
+      const randomColorName = colors[Math.floor(Math.random() * colors.length)];
+      const randomTextColor = colors[Math.floor(Math.random() * colors.length)];
+      correctColor = randomTextColor;
+      document.getElementById('color-name').textContent = randomColorName;
+      document.getElementById('color-name').style.color = randomTextColor;
+    }
+
+    function checkColor(selectedColor) {
+      if (selectedColor === correctColor) {
+        document.getElementById('feedback').textContent = 'Correct! You win.';
+      } else {
+        document.getElementById('feedback').textContent = 'Wrong! You lose.';
+      }
+      document.getElementById('feedback').classList.remove('hidden');
+      document.getElementById('buttons-container').classList.add('hidden');
+      window.parent.postMessage('gameOver', '*');
+    }
+  </script>
+</body>
+</html>
