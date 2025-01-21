@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Which Cup Is It?</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .hidden {
+      display: none;
+    }
+    .cups {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    .cup {
+      width: 50px;
+      height: 80px;
+      background-color: #007BFF;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h2>Which Cup Is It?</h2>
+    <div class="cups">
+      <div class="cup" onclick="checkCup(0)"></div>
+      <div class="cup" onclick="checkCup(1)"></div>
+      <div class="cup" onclick="checkCup(2)"></div>
+    </div>
+    <button id="start-btn" class="hidden" onclick="startGame()">Restart</button>
+    <p id="feedback" class="hidden"></p>
+  </div>
+
+  <script>
+    let correctCup;
+
+    function startGame() {
+      document.getElementById('start-btn').classList.add('hidden');
+      document.getElementById('feedback').classList.add('hidden');
+      correctCup = Math.floor(Math.random() * 3);
+      shuffleCups();
+    }
+
+    function shuffleCups() {
+      const cups = document.querySelectorAll('.cup');
+      cups.forEach((cup, index) => {
+        if (index === correctCup) {
+          cup.textContent = '⚽';
+        } else {
+          cup.textContent = '';
+        }
+      });
+      setTimeout(() => {
+        cups.forEach(cup => cup.textContent = '');
+      }, 2000);
+    }
+
+    function checkCup(selectedCup) {
+      if (selectedCup === correctCup) {
+        document.getElementById('feedback').textContent = 'Correct! You win.';
+      } else {
+        document.getElementById('feedback').textContent = 'Wrong! You lose.';
+      }
+      document.getElementById('feedback').classList.remove('hidden');
+      document.getElementById('start-btn').classList.remove('hidden');
+      window.parent.postMessage('gameOver', '*');
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
